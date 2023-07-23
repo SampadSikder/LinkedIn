@@ -59,7 +59,7 @@ const getImageFromMinio = (imageId) => {
 
 
 async function createPost(req, res) {
-    const _userId = req.params.id;
+    const _userId = req.user.id;
     const body = req.body.status;
     console.log(req.body);
 
@@ -81,17 +81,21 @@ async function createPost(req, res) {
 }
 
 async function getPosts(req, res) {
-    const _userId = req.params.id;
+    const _userId = req.user.id;
     try {
         const allPosts = await Posts.find({ _userId: { $ne: _userId } }).lean();
 
-        const postWithUsernames = await Promise.all(
+        const postsWithUsername = await Promise.all(
             allPosts.map(async (post) => {
                 const user = await Users.findById(post._userId).lean();
-                const imageBuffer = post._imageId ? await getImageFromMinio(post._imageId) : null;
-                const base64String = imageBuffer ? imageBuffer.toString('base64') : null;
-                const mimeType = 'image/jpeg';
-                const image = base64String ? `data:${mimeType};base64,${base64String}` : null;
+                let image = null;
+                if (post._imageId != null) {
+                    image = 'http://10.100.103.162:9000/linked-in/' + post._imageId;
+                }
+                // const imageBuffer = post._imageId ? await getImageFromMinio(post._imageId) : null;
+                // const base64String = imageBuffer ? imageBuffer.toString('base64') : null;
+                // const mimeType = 'image/jpeg';
+                // const image = base64String ? `data:${mimeType};base64,${base64String}` : null;
 
                 return {
                     ...post,
@@ -100,25 +104,28 @@ async function getPosts(req, res) {
                 };
             })
         );
-
-        res.json(postWithUsernames);
+        res.json(postsWithUsername);
     } catch (error) {
         res.status(500).json({ error: 'Server error' });
     }
 }
 
 async function getOwnPosts(req, res) {
-    const _userId = req.params.id;
+    const _userId = req.user.id;
     try {
         const allPosts = await Posts.find({ _userId: _userId }).lean();
 
         const postsWithUsername = await Promise.all(
             allPosts.map(async (post) => {
                 const user = await Users.findById(post._userId).lean();
-                const imageBuffer = post._imageId ? await getImageFromMinio(post._imageId) : null;
-                const base64String = imageBuffer ? imageBuffer.toString('base64') : null;
-                const mimeType = 'image/jpeg';
-                const image = base64String ? `data:${mimeType};base64,${base64String}` : null;
+                let image = null;
+                if (post._imageId != null) {
+                    image = 'http://10.100.103.162:9000/linked-in/' + post._imageId;
+                }
+                // const imageBuffer = post._imageId ? await getImageFromMinio(post._imageId) : null;
+                // const base64String = imageBuffer ? imageBuffer.toString('base64') : null;
+                // const mimeType = 'image/jpeg';
+                // const image = base64String ? `data:${mimeType};base64,${base64String}` : null;
 
                 return {
                     ...post,

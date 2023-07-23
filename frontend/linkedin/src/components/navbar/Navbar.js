@@ -7,17 +7,17 @@ function Navbar() {
     const goToHome = (event) => {
         event.preventDefault();
         const id = localStorage.getItem('id');
-        navigate(`/feed/${id}`);
+        navigate(`/feed`);
     }
     const goToNewPost = (event) => {
         event.preventDefault();
         const id = localStorage.getItem('id');
-        navigate(`/newpost/${id}`);
+        navigate(`/newpost`);
     }
     const goToProfile = (event) => {
         event.preventDefault();
         const id = localStorage.getItem('id');
-        navigate(`/profile/${id}`);
+        navigate(`/profile`);
     }
     const handleSignOut = (event) => {
         event.preventDefault();

@@ -39,13 +39,13 @@ async function login(req, res) {
         bcrypt.compare(password, foundUser.password).then((match) => {
             if (match) {
                 const user = {
-                    email: foundUser.email
+                    email: foundUser.email,
+                    id: foundUser._id
                 }
                 const secretKey = process.env.ACCESS_TOKEN_SECRET;
                 const accessToken = jwt.sign(user, secretKey);
                 res.status(200).json({
-                    token: accessToken,
-                    id: foundUser._id
+                    token: accessToken
                 });
             } else {
                 res.json({ message: "Invalid Credentials" });

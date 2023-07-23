@@ -6,14 +6,13 @@ import axios from "../../../Axios/axios";
 function Profile() {
     const [posts, setPosts] = useState([]);
     useEffect(() => {
-        const id = localStorage.getItem('id');
         const token = localStorage.getItem('token');
         const config = {
             headers: {
                 Authorization: 'Bearer ' + token
             }
         }
-        axios.get(`/ownposts/${id}`, config).then((response) => {
+        axios.get(`/ownposts`, config).then((response) => {
             console.log(response.data.reverse());
             setPosts(response.data);
         }).catch((error) => {

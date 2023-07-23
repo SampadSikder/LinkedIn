@@ -20,15 +20,15 @@ export const router = createBrowserRouter([
                 element: <Signup></Signup>
             },
             {
-                path: "/feed/:id",
+                path: "/feed",
                 element: <Feed></Feed>
             },
             {
-                path: "newpost/:id",
+                path: "newpost",
                 element: <NewPosts></NewPosts>
             },
             {
-                path: "profile/:id",
+                path: "profile",
                 element: <Profile></Profile>
             }
         ]

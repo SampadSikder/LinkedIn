@@ -16,7 +16,6 @@ function NewPosts() {
     const handleSubmit = (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
-        const id = localStorage.getItem('id');
         const config = {
             headers: {
                 Authorization: 'Bearer ' + token,
@@ -27,7 +26,7 @@ function NewPosts() {
             status: status,
             image: filedetails
         }
-        axios.post(`/posts/${id}`, formData, config).then((response) => {
+        axios.post(`/posts`, formData, config).then((response) => {
             alert(response.data.message);
         }).catch((err) => {
             alert(err.message);

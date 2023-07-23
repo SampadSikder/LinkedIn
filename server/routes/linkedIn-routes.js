@@ -20,9 +20,9 @@ const upload = multer({
 router.get("/users", authentication, userController.getUser);
 router.post("/register", userController.createUser);
 router.post("/login", userController.login);
-router.post("/posts/:id", authentication, upload.single("image"), postController.createPost);
+router.post("/posts", authentication, upload.single("image"), postController.createPost);
 router.get("/notifications", authentication, notifications.getNotifications);
-router.get("/posts/:id", authentication, postController.getPosts);
-router.get("/ownposts/:id", authentication, postController.getOwnPosts);
+router.get("/posts", authentication, postController.getPosts);
+router.get("/ownposts", authentication, postController.getOwnPosts);
 
 module.exports = router;
