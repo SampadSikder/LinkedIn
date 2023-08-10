@@ -1,6 +1,7 @@
 const { Posts } = require("../models/Posts");
 const { Users } = require("../models/Users");
 const { Notifications } = require("../models/Notifications");
+const { postNotification } = require("../controllers/notification-controller");
 const Minio = require('minio');
 
 
@@ -31,53 +32,24 @@ async function uploadToMinio(file) {
     return objectKey;
 }
 
-const getImageFromMinio = (imageId) => {
-    return new Promise((resolve, reject) => {
-        minioClient.getObject('linked-in', imageId, (err, dataStream) => {
-            if (err) {
-                // Handle any error when fetching the image from MinIO
-                reject(err);
-            } else {
-                const chunks = [];
-                dataStream.on('data', (chunk) => {
-                    chunks.push(chunk);
-                });
 
-                dataStream.on('end', () => {
-                    // Concatenate the binary chunks and resolve with the image data
-                    const imageData = Buffer.concat(chunks);
-                    resolve(imageData);
-                });
-
-                dataStream.on('error', (err) => {
-                    reject(err);
-                });
-            }
-        });
-    });
-};
 
 
 async function createPost(req, res) {
     const _userId = req.user.id;
     const body = req.body.status;
-    console.log(req.body);
+    let _imageId = null;
 
-    try {
-        let _imageId = null;
-
-        if (req.file) {
-            _imageId = await uploadToMinio(req.file);
-        }
-        _imageId = _imageId ? _imageId : null;
-        await Posts.create({ body: body, _userId: _userId, _imageId: _imageId });
-        const user = Users.findById(req.params.id);
-        console.log(user);
-        await Notifications.create({ notification: "New post from " + user.username });
-        res.json({ message: "Successfully created post" });
-    } catch (err) {
-        res.json({ error: err.message });
+    if (req.file) {
+        _imageId = await uploadToMinio(req.file);
     }
+    _imageId = _imageId ? _imageId : null;
+    await Posts.create({ body: body, _userId: _userId, _imageId: _imageId });
+    const users = await Users.find({ _userId: { $ne: req.user.id } }).lean();
+    const notification = "New post from " + req.user.email;
+    await postNotification(notification, users);
+    res.json({ message: "Successfully created post" });
+
 }
 
 async function getPosts(req, res) {
@@ -92,10 +64,6 @@ async function getPosts(req, res) {
                 if (post._imageId != null) {
                     image = 'http://10.100.103.162:9000/linked-in/' + post._imageId;
                 }
-                // const imageBuffer = post._imageId ? await getImageFromMinio(post._imageId) : null;
-                // const base64String = imageBuffer ? imageBuffer.toString('base64') : null;
-                // const mimeType = 'image/jpeg';
-                // const image = base64String ? `data:${mimeType};base64,${base64String}` : null;
 
                 return {
                     ...post,
@@ -122,11 +90,6 @@ async function getOwnPosts(req, res) {
                 if (post._imageId != null) {
                     image = 'http://10.100.103.162:9000/linked-in/' + post._imageId;
                 }
-                // const imageBuffer = post._imageId ? await getImageFromMinio(post._imageId) : null;
-                // const base64String = imageBuffer ? imageBuffer.toString('base64') : null;
-                // const mimeType = 'image/jpeg';
-                // const image = base64String ? `data:${mimeType};base64,${base64String}` : null;
-
                 return {
                     ...post,
                     username: user ? user.username : null,

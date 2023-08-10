@@ -1,5 +1,6 @@
 const { Users } = require("../models/Users");
 const { Notifications } = require("../models/Notifications");
+const { postNotification } = require("../controllers/notification-controller");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -23,7 +24,9 @@ async function createUser(req, res) {
 
     bcrypt.hash(password, 10).then((hash) => {
         Users.create({ email: email, password: hash, username: username }).then((response) => {
-            Notifications.create({ notification: "Welcome " + username + " to linkedin" });
+            const notification = "Welcome to linked-in " + username;
+            const users = Users.find();
+            postNotification(notification, users);
             res.json({ message: "User created successfully" });
         }).catch((error) => {
             res.json(error);
