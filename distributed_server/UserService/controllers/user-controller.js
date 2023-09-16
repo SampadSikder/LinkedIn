@@ -43,9 +43,12 @@ async function login(req, res) {
             if (match) {
                 const user = {
                     email: foundUser.email,
-                    id: foundUser._id
+                    id: foundUser._id,
+                    username: foundUser.username
                 }
-                const secretKey = process.env.ACCESS_TOKEN_SECRET;
+
+                const secretKey = `${process.env.ACCESS_TOKEN_SECRET}`;
+                console.log(secretKey);
                 const accessToken = jwt.sign(user, secretKey);
                 res.status(200).json({
                     token: accessToken

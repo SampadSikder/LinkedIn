@@ -1,2 +1,5 @@
 /frontend/linkedin/node_modules
 /server/node_modules
+/distributed_server/UserService/node_modules
+/distributed_server/PostService/node_modules
+/distributed_server/PostService/public

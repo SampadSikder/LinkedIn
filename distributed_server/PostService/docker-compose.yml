@@ -1,0 +1,30 @@
+version: '3.4'
+
+services:
+  postservice:
+    image: postservice
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3011:3011
+    depends_on:
+      - mongo
+      - minio
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27021:27017"
+    volumes:
+      - post-data:/data/db
+  minio:
+    image: minio/minio:latest
+    environment:
+      - MINIO_ACCESS_KEY='x6yve3ySG5ntN4lH78Dq'
+      - MINIO_SECRET_KEY='5sPgT2AXZJjJo89qQHhJzoNmT5TkPVO6cgWGesJn'
+    command: server --address 0.0.0.0:9000 /data
+volumes:
+  post-data:
