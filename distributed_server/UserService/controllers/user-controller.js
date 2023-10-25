@@ -21,6 +21,7 @@ async function createUser(req, res) {
     const email = req.body.email;
     const password = req.body.password;
     const username = req.body.username;
+    console.log(username, email, password);
 
     bcrypt.hash(password, 10).then((hash) => {
         Users.create({ email: email, password: hash, username: username }).then((response) => {
@@ -58,7 +59,7 @@ async function login(req, res) {
             }
         })
     }).catch((error) => {
-        res.json({ message: "No user found" });
+        res.json({ message: "No user found", error });
     })
 }
 

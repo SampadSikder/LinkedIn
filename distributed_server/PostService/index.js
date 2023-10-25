@@ -11,7 +11,7 @@ const routes = require('./routes/linkedIn-routes');
 app.use("/", routes);
 
 
-mongoose.connect("mongodb://mongo:27017/postdb").then((result) => {
+mongoose.connect("mongodb://post_db:27017/postdb").then((result) => {
     app.listen(3011, () => {
         console.log("Server is running");
     })
