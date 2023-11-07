@@ -19,7 +19,7 @@ services:
     ports:
       - "3010:3010"
     environment:
-      MONGO_INITDB_DATABASE: userdb
+      NODE_ENV: production
     depends_on:
       - user_db
 
@@ -27,12 +27,13 @@ services:
     image: mongo:latest
     restart: unless-stopped
     volumes:
-      - post-data:/data/db
+      - user-data:/data/db
+
   post_db:
     image: mongo:latest
     restart: unless-stopped
     volumes:
-      - user-data:/data/db
+      - post-data:/data/db
 
   postservice:
     image: postservice
@@ -48,11 +49,15 @@ services:
 
   minio:
     image: minio/minio:latest
+    ports:
+      - 9000:9000
+      - 9090:9090
     environment:
-      MINIO_ACCESS_KEY: 'x6yve3ySG5ntN4lH78Dq'
-      MINIO_SECRET_KEY: '5sPgT2AXZJjJo89qQHhJzoNmT5TkPVO6cgWGesJn'
-    command: server --address 0.0.0.0:9000 /data
-
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    command: server /data --console-address ":9090"
+    volumes:
+      - ~/minio/data:/data
 volumes:
   user-data:
   post-data:

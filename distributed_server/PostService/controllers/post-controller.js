@@ -5,11 +5,11 @@ const Minio = require('minio');
 
 
 const minioClient = new Minio.Client({
-    endPoint: '127.0.0.1',
+    endPoint: 'host.docker.internal',
     port: 9000,
     useSSL: false,
-    accessKey: 'x6yve3ySG5ntN4lH78Dq',
-    secretKey: '5sPgT2AXZJjJo89qQHhJzoNmT5TkPVO6cgWGesJn'
+    accessKey: 'GccUSTyzbBIHuDZE9LDx',
+    secretKey: 'etmTp7K7SKJf5EBQIiOSnP9fdAOSGaCZWObR6ZXH'
 });
 
 async function uploadToMinio(file) {
@@ -82,14 +82,13 @@ async function getOwnPosts(req, res) {
 
         const postsWithUsername = await Promise.all(
             allPosts.map(async (post) => {
-                const user = await Users.findById(post._userId).lean();
                 let image = null;
                 if (post._imageId != null) {
                     image = 'http://127.0.0.1:9000/linked-in/' + post._imageId;
                 }
                 return {
                     ...post,
-                    username: user ? user.username : null,
+                    username: post._username,
                     image,
                 };
             })
