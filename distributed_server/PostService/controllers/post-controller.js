@@ -1,15 +1,30 @@
 const { Posts } = require("../models/Posts");
 //const { Notifications } = require("../models/Notifications");
 //const { postNotification } = require("../controllers/notification-controller");
+const axios = require("axios");
 const Minio = require('minio');
 
 
+async function postNotification(_username) {
+    const notification = "New post from " + _username;
+    try {
+        const response = await axios.post("http://notificationservice:3012/notifications", {
+            notification: notification,
+        });
+        console.log(response);
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+}
+
 const minioClient = new Minio.Client({
-    endPoint: '127.0.0.1',
+    endPoint: 'host.docker.internal',
     port: 9000,
     useSSL: false,
-    accessKey: 'x6yve3ySG5ntN4lH78Dq',
-    secretKey: '5sPgT2AXZJjJo89qQHhJzoNmT5TkPVO6cgWGesJn'
+    accessKey: 'GccUSTyzbBIHuDZE9LDx',
+    secretKey: 'etmTp7K7SKJf5EBQIiOSnP9fdAOSGaCZWObR6ZXH'
 });
 
 async function uploadToMinio(file) {
@@ -45,7 +60,9 @@ async function createPost(req, res) {
     }
     _imageId = _imageId ? _imageId : null;
     await Posts.create({ body: body, _userId: _userId, _imageId: _imageId, _username: username });
-    //await postNotification(notification, users);
+
+
+    await postNotification(username);
     res.json({ message: "Successfully created post" });
 
 }
@@ -82,14 +99,13 @@ async function getOwnPosts(req, res) {
 
         const postsWithUsername = await Promise.all(
             allPosts.map(async (post) => {
-                const user = await Users.findById(post._userId).lean();
                 let image = null;
                 if (post._imageId != null) {
                     image = 'http://127.0.0.1:9000/linked-in/' + post._imageId;
                 }
                 return {
                     ...post,
-                    username: user ? user.username : null,
+                    username: post._username,
                     image,
                 };
             })

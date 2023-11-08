@@ -3,7 +3,21 @@ const { Users } = require("../models/Users");
 //const { postNotification } = require("../controllers/notification-controller");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
 
+async function postNotification(_username) {
+    const notification = "Welcome to linked-in " + _username;
+    try {
+        const response = await axios.post("http://notificationservice:3012/notifications", {
+            notification: notification,
+        });
+        console.log(response);
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+}
 
 async function getUser(req, res) {
     const username = req.user.email;
@@ -21,12 +35,13 @@ async function createUser(req, res) {
     const email = req.body.email;
     const password = req.body.password;
     const username = req.body.username;
+    console.log(username, email, password);
 
     bcrypt.hash(password, 10).then((hash) => {
         Users.create({ email: email, password: hash, username: username }).then((response) => {
             const notification = "Welcome to linked-in " + username;
             const users = Users.find();
-            //postNotification(notification, users);
+            postNotification(notification, users);
             res.json({ message: "User created successfully" });
         }).catch((error) => {
             res.json(error);
@@ -58,7 +73,7 @@ async function login(req, res) {
             }
         })
     }).catch((error) => {
-        res.json({ message: "No user found" });
+        res.json({ message: "No user found", error });
     })
 }
 
