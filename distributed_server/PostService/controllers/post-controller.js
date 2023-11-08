@@ -1,8 +1,23 @@
 const { Posts } = require("../models/Posts");
 //const { Notifications } = require("../models/Notifications");
 //const { postNotification } = require("../controllers/notification-controller");
+const axios = require("axios");
 const Minio = require('minio');
 
+
+async function postNotification(_username) {
+    const notification = "New post from " + _username;
+    try {
+        const response = await axios.post("http://notificationservice:3012/notifications", {
+            notification: notification,
+        });
+        console.log(response);
+    }
+    catch (err) {
+        console.log(err);
+    }
+
+}
 
 const minioClient = new Minio.Client({
     endPoint: 'host.docker.internal',
@@ -45,7 +60,9 @@ async function createPost(req, res) {
     }
     _imageId = _imageId ? _imageId : null;
     await Posts.create({ body: body, _userId: _userId, _imageId: _imageId, _username: username });
-    //await postNotification(notification, users);
+
+
+    await postNotification(username);
     res.json({ message: "Successfully created post" });
 
 }

@@ -31,3 +31,7 @@ Run the container
 
 
 Careful about the ports of nginx image and outside port. In my case I used 8080 as the localport and 80 as docker port.
+
+The microservice architecture of the project is attached below:
+
+![image](linkedin.png)

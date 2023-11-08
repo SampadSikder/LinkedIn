@@ -35,6 +35,23 @@ services:
     volumes:
       - post-data:/data/db
 
+  notification_db:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - notification-data:/data/db
+
+  notificationservice:
+    image: notificationservice
+    build:
+      context: ./distributed_server/NotificationService
+    environment:
+      NODE_ENV: production
+    ports:
+      - "3012:3012"
+    depends_on:
+      - notification_db
+
   postservice:
     image: postservice
     build:
@@ -61,3 +78,4 @@ services:
 volumes:
   user-data:
   post-data:
+  notification-data:
